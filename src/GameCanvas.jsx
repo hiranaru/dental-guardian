@@ -1,43 +1,37 @@
 import { useEffect, useRef, useState } from "react";
 
-const W = 360;
-const H = 640;
-const MAX_LIFE = 3;
+const W = 360, H = 640;
+const MAX_LIFE = 3;              // ★ライフ上限
 
 export default function GameCanvas() {
   const cvsRef = useRef(null);
-  const [gameOver, setGameOver] = useState(false);
+  const [gameOver, setGameOver] = useState(false);   // ★React state で結果画面に切替
 
   useEffect(() => {
-    if (gameOver) return; // 終了後はループ停止
+    if (gameOver) return;        // 終了後にループを走らせない
     const cvs = cvsRef.current;
     const ctx = cvs.getContext("2d");
-    cvs.width = W;
-    cvs.height = H;
+    cvs.width = W; cvs.height = H;
 
-    /* === 画像読み込み === */
-    const bgImg = new Image();
+    /* === 画像 === */
+    const bgImg     = new Image();
     const playerImg = new Image();
     const bulletImg = new Image();
-    const enemyImg = new Image();
+    const enemyImg  = new Image();
 
-    bgImg.src = "/img/bg_tooth_surface.png"; // 背景
+    bgImg.src     = "/img/bg_tooth_surface.png";
     playerImg.src = "/img/player_tbrush.png";
     bulletImg.src = "/img/weapon_brush_shot.png";
-    enemyImg.src = "/img/enemy_cavity_a.png";
+    enemyImg.src  = "/img/enemy_cavity_a.png";
 
     /* === 状態 === */
-    let px = W / 2 - 60,
-      py = H - 120;
-    const bullets = [],
-      enemies = [];
-    let score = 0,
-      frame = 0,
-      life = MAX_LIFE;
+    let px = W / 2 - 60, py = H - 120;
+    const bullets = [], enemies = [];
+    let score = 0, frame = 0;
 
-    /* ★背景拡大用 */
-    let bgScale = 1; // 画像ロード後に初期倍率を計算
-    const ZOOM_SPEED = 0.00003; // 超ゆっくり
+    /* ★ライフとゲームオーバーフラグ */
+    let life = MAX_LIFE;
+    let bgScale = 1.0, ZOOM_SPEED = 0.00003;
 
     /* === 入力 === */
     const move = (e) => {
@@ -53,66 +47,66 @@ export default function GameCanvas() {
     cvs.addEventListener("click", shoot);
 
     /* === メインループ === */
-    bgImg.onload = () => {
-      /* ★キャンバスにぴったり収まる初期倍率を計算 */
-      bgScale = Math.min(W / bgImg.width, H / bgImg.height);
+    enemyImg.onload = () => {
+      const loop = () => {
+        frame++;
 
-      enemyImg.onload = () => {
-        const loop = () => {
-          frame++;
+        /* --- 更新 --- */
+        bgScale += ZOOM_SPEED;
 
-          /* 更新 */
-          bgScale += ZOOM_SPEED; // じわじわ拡大
+        bullets.forEach((b) => (b.y -= 8));
+        if (frame % 60 === 0) enemies.push({ x: Math.random() * (W - 100), y: -100 });
+        enemies.forEach((e) => (e.y += 2));
 
-          bullets.forEach((b) => (b.y -= 8));
-          if (frame % 60 === 0)
-            enemies.push({ x: Math.random() * (W - 100), y: -100 });
-          enemies.forEach((e) => (e.y += 2));
-
-          // 判定（弾→敵）
-          bullets.forEach((b, bi) => {
-            enemies.forEach((e, ei) => {
-              if (hit(b.x, b.y, 32, 32, e.x, e.y, 100, 100)) {
-                bullets.splice(bi, 1);
-                enemies.splice(ei, 1);
-                score++;
-              }
-            });
-          });
-          // 判定（敵→プレイヤー）
+        /* ★当たり判定（弾→敵） */
+        bullets.forEach((b, bi) => {
           enemies.forEach((e, ei) => {
-            if (hit(px, py, 120, 120, e.x, e.y, 100, 100)) {
+            if (rectHit(b.x, b.y, 32, 32, e.x, e.y, 100, 100)) {
+              bullets.splice(bi, 1);
               enemies.splice(ei, 1);
-              life--;
-              if (life <= 0) setGameOver(true);
+              score++;
             }
           });
+        });
 
-          /* 描画 */
-          ctx.fillStyle = "#000";
-          ctx.fillRect(0, 0, W, H);
+        /* ★当たり判定（敵→プレイヤー） */
+        enemies.forEach((e, ei) => {
+          if (rectHit(px, py, 120, 120, e.x, e.y, 100, 100)) {
+            enemies.splice(ei, 1);   // 敵を消す
+            life--;                  // ライフを減らす
+            if (life <= 0) {
+              setGameOver(true);     // React state 更新
+            }
+          }
+        });
 
-          // 背景を中央基準でズーム描画
-          const bw = bgImg.width * bgScale;
-          const bh = bgImg.height * bgScale;
-          ctx.drawImage(bgImg, (W - bw) / 2, (H - bh) / 2, bw, bh);
+        /* --- 描画 --- */
+        // 背景（ゆっくり拡大）
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, W, H);
+        const bw = bgImg.width * bgScale;
+        const bh = bgImg.height * bgScale;
+        ctx.drawImage(bgImg, (W - bw) / 2, (H - bh) / 2, bw, bh);
 
-          ctx.drawImage(playerImg, px, py, 120, 120);
-          bullets.forEach((b) => ctx.drawImage(bulletImg, b.x, b.y, 32, 32));
-          enemies.forEach((e) => ctx.drawImage(enemyImg, e.x, e.y, 100, 100));
+        // ゲームオブジェクト
+        ctx.drawImage(playerImg, px, py, 120, 120);
+        bullets.forEach((b) => ctx.drawImage(bulletImg, b.x, b.y, 32, 32));
+        enemies.forEach((e) => ctx.drawImage(enemyImg, e.x, e.y, 100, 100));
 
-          ctx.fillStyle = "#000";
-          ctx.font = "20px sans-serif";
-          ctx.fillText(`Score: ${score}`, 10, 30);
-          ctx.fillText(`HP: ${"❤️".repeat(life)}`, 10, 55);
+        // スコア
+        ctx.fillStyle = "#000";
+        ctx.font = "20px sans-serif";
+        ctx.fillText("Score: " + score, 10, 30);
 
-          if (!gameOver) requestAnimationFrame(loop);
-        };
-        loop();
+        // ★ライフゲージ（シンプルに❤️テキスト）
+        ctx.fillText("HP: " + "❤️".repeat(life), 10, 55);
+
+        if (!gameOver) requestAnimationFrame(loop);
       };
+      loop();
     };
 
-    /* クリーンアップ */
+    /* --- クリーンアップ --- */
     return () => {
       cvs.removeEventListener("mousemove", move);
       cvs.removeEventListener("touchmove", move);
@@ -121,11 +115,11 @@ export default function GameCanvas() {
     };
   }, [gameOver]);
 
-  /* === 当たり判定ユーティリティ === */
-  const hit = (x1, y1, w1, h1, x2, y2, w2, h2) =>
+  /* ★ユーティリティ：矩形ヒット判定 */
+  const rectHit = (x1, y1, w1, h1, x2, y2, w2, h2) =>
     x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
 
-  /* === ゲームオーバー画面 === */
+  /* ★ゲームオーバー画面 */
   if (gameOver) {
     return (
       <div
@@ -146,5 +140,6 @@ export default function GameCanvas() {
     );
   }
 
+  /* 通常時はキャンバス */
   return <canvas ref={cvsRef}></canvas>;
 }
