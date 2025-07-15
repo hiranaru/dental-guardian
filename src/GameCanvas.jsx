@@ -1,37 +1,39 @@
 import { useEffect, useRef, useState } from "react";
 
-const W = 360, H = 640;
-const MAX_LIFE = 3;              // ★ライフ上限
+const W = 360;
+const H = 640;
+const MAX_LIFE = 3;
 
 export default function GameCanvas() {
   const cvsRef = useRef(null);
-  const [gameOver, setGameOver] = useState(false);   // ★React state で結果画面に切替
+  const [gameOver, setGameOver] = useState(false);
 
   useEffect(() => {
-    if (gameOver) return;        // 終了後にループを走らせない
+    if (gameOver) return;
     const cvs = cvsRef.current;
     const ctx = cvs.getContext("2d");
-    cvs.width = W; cvs.height = H;
+    cvs.width = W;
+    cvs.height = H;
 
     /* === 画像 === */
-    const bgImg     = new Image();
+    const bgImg = new Image();
     const playerImg = new Image();
     const bulletImg = new Image();
-    const enemyImg  = new Image();
+    const enemyImg = new Image();
 
-    bgImg.src     = "/img/bg_tooth_surface.png";
+    bgImg.src = "/img/bg_tooth_surface.png";      // 背景
     playerImg.src = "/img/player_tbrush.png";
     bulletImg.src = "/img/weapon_brush_shot.png";
-    enemyImg.src  = "/img/enemy_cavity_a.png";
+    enemyImg.src = "/img/enemy_cavity_a.png";
 
     /* === 状態 === */
-    let px = W / 2 - 60, py = H - 120;
-    const bullets = [], enemies = [];
-    let score = 0, frame = 0;
-
-    /* ★ライフとゲームオーバーフラグ */
-    let life = MAX_LIFE;
-    let bgScale = 1.0, ZOOM_SPEED = 0.00003;
+    let px = W / 2 - 60,
+      py = H - 120;
+    const bullets = [],
+      enemies = [];
+    let score = 0,
+      frame = 0,
+      life = MAX_LIFE;
 
     /* === 入力 === */
     const move = (e) => {
@@ -51,62 +53,50 @@ export default function GameCanvas() {
       const loop = () => {
         frame++;
 
-        /* --- 更新 --- */
-        bgScale += ZOOM_SPEED;
-
+        /* 更新 */
         bullets.forEach((b) => (b.y -= 8));
-        if (frame % 60 === 0) enemies.push({ x: Math.random() * (W - 100), y: -100 });
+        if (frame % 60 === 0)
+          enemies.push({ x: Math.random() * (W - 100), y: -100 });
         enemies.forEach((e) => (e.y += 2));
 
-        /* ★当たり判定（弾→敵） */
+        // 判定（弾→敵）
         bullets.forEach((b, bi) => {
           enemies.forEach((e, ei) => {
-            if (rectHit(b.x, b.y, 32, 32, e.x, e.y, 100, 100)) {
+            if (hit(b.x, b.y, 32, 32, e.x, e.y, 100, 100)) {
               bullets.splice(bi, 1);
               enemies.splice(ei, 1);
               score++;
             }
           });
         });
-
-        /* ★当たり判定（敵→プレイヤー） */
+        // 判定（敵→プレイヤー）
         enemies.forEach((e, ei) => {
-          if (rectHit(px, py, 120, 120, e.x, e.y, 100, 100)) {
-            enemies.splice(ei, 1);   // 敵を消す
-            life--;                  // ライフを減らす
-            if (life <= 0) {
-              setGameOver(true);     // React state 更新
-            }
+          if (hit(px, py, 120, 120, e.x, e.y, 100, 100)) {
+            enemies.splice(ei, 1);
+            life--;
+            if (life <= 0) setGameOver(true);
           }
         });
 
-        /* --- 描画 --- */
-        // 背景（ゆっくり拡大）
-        ctx.fillStyle = "#000";
-        ctx.fillRect(0, 0, W, H);
-        const bw = bgImg.width * bgScale;
-        const bh = bgImg.height * bgScale;
-        ctx.drawImage(bgImg, (W - bw) / 2, (H - bh) / 2, bw, bh);
+        /* 描画 */
+        // 背景をキャンバス全体にフィットさせて描画
+        ctx.drawImage(bgImg, 0, 0, W, H);
 
-        // ゲームオブジェクト
         ctx.drawImage(playerImg, px, py, 120, 120);
         bullets.forEach((b) => ctx.drawImage(bulletImg, b.x, b.y, 32, 32));
         enemies.forEach((e) => ctx.drawImage(enemyImg, e.x, e.y, 100, 100));
 
-        // スコア
         ctx.fillStyle = "#000";
         ctx.font = "20px sans-serif";
-        ctx.fillText("Score: " + score, 10, 30);
-
-        // ★ライフゲージ（シンプルに❤️テキスト）
-        ctx.fillText("HP: " + "❤️".repeat(life), 10, 55);
+        ctx.fillText(`Score: ${score}`, 10, 30);
+        ctx.fillText(`HP: ${"❤️".repeat(life)}`, 10, 55);
 
         if (!gameOver) requestAnimationFrame(loop);
       };
       loop();
     };
 
-    /* --- クリーンアップ --- */
+    /* クリーンアップ */
     return () => {
       cvs.removeEventListener("mousemove", move);
       cvs.removeEventListener("touchmove", move);
@@ -115,11 +105,11 @@ export default function GameCanvas() {
     };
   }, [gameOver]);
 
-  /* ★ユーティリティ：矩形ヒット判定 */
-  const rectHit = (x1, y1, w1, h1, x2, y2, w2, h2) =>
+  /* 矩形ヒット判定 */
+  const hit = (x1, y1, w1, h1, x2, y2, w2, h2) =>
     x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
 
-  /* ★ゲームオーバー画面 */
+  /* ゲームオーバー画面 */
   if (gameOver) {
     return (
       <div
@@ -140,6 +130,5 @@ export default function GameCanvas() {
     );
   }
 
-  /* 通常時はキャンバス */
   return <canvas ref={cvsRef}></canvas>;
 }
