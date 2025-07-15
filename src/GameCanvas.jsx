@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import playerImg from '../img/player_tbrush.png';
 
 const W = 360, H = 640;
 
