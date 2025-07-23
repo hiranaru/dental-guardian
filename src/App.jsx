@@ -17,7 +17,7 @@ export default function App() {
     >
       {/* スタート画像全体 */}
       <img
-        src="/start.png"
+        src="/img/start.png"
         alt="Start Screen"
         style={{
           width: "100%",
