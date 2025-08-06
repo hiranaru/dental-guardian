@@ -11,3 +11,19 @@ canvas {
   width: 100%;
   height: auto;
 }
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  background: #fff;
+  overflow: hidden; /* 画面スクロール防止 */
+}
+
+.game-wrapper {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #fff;
+}
