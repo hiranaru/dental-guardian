@@ -5,7 +5,7 @@ export default function GameUI({ score, life, bombs, onPause }) {
     <div className="game-ui">
       {/* 上部バー */}
       <div className="ui-top-bar">
-        <button className="pause-button" onClick={onPause}>⏸ ポーズ</button>
+        <button className="pause-button" onClick={onPause}>⏸</button>
       </div>
 
       {/* 今後追加予定のナビウィンドウやボタン類をここに */}
