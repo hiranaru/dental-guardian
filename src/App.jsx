@@ -15,27 +15,17 @@ export default function App() {
 
   // ポーズボタン押下時の処理
   const handlePause = () => {
-    setPaused(prev => !prev); // ポーズ状態を切り替える
+    setPaused(prev => !prev);
   };
 
-  const [paused, setPaused] = useState(false);
-
-<GameCanvas
-  setScore={setScore}
-  setLife={setLife}
-  setBombs={setBombs}
-  paused={paused}
-  setPaused={setPaused}
-/>
-
-  
   return started ? (
     <div className="game-wrapper">
       <GameCanvas
         setScore={setScore}
         setLife={setLife}
         setBombs={setBombs}
-        paused={paused} // ← 追加
+        paused={paused}
+        setPaused={setPaused}
       />
       <GameUI
         score={score}
