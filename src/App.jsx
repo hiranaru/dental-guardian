@@ -18,6 +18,17 @@ export default function App() {
     setPaused(prev => !prev); // ポーズ状態を切り替える
   };
 
+  const [paused, setPaused] = useState(false);
+
+<GameCanvas
+  setScore={setScore}
+  setLife={setLife}
+  setBombs={setBombs}
+  paused={paused}
+  setPaused={setPaused}
+/>
+
+  
   return started ? (
     <div className="game-wrapper">
       <GameCanvas
