@@ -4,6 +4,11 @@ const W = 360;
 const H = 640;
 const MAX_LIFE = 3;
 
+// スコア整形関数（000,000,000形式）
+function formatScore(num) {
+  return num.toString().padStart(9, "0").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+}
+
 export default function GameCanvas({ setScore, setLife, setBombs, paused }) {
   const cvsRef = useRef(null);
   const [gameOver, setGameOver] = useState(false);
@@ -91,10 +96,14 @@ export default function GameCanvas({ setScore, setLife, setBombs, paused }) {
         bullets.forEach((b) => ctx.drawImage(bulletImg, b.x, b.y, 32, 32));
         enemies.forEach((e) => ctx.drawImage(enemyImg, e.x, e.y, 100, 100));
 
-        ctx.fillStyle = "#000";
-        ctx.font = "20px sans-serif";
-        ctx.fillText(`Score: ${score}`, 10, 30);
-        ctx.fillText(`HP: ${"❤️".repeat(life)}`, 10, 55);
+        // スコア表示（子供向けフォント＆カラー）
+        ctx.font = "18px 'Rounded Mplus 1c', sans-serif";
+        ctx.fillStyle = "#007ACC";
+        ctx.fillText(`クリーンポイント: ${formatScore(score)}`, 10, 30);
+
+        // HP表示
+        ctx.fillStyle = "#e60039";
+        ctx.fillText(`歯の健康度: ${"❤️".repeat(life)}`, 10, 55);
 
         animationId = requestAnimationFrame(loop);
       };
