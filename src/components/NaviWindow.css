@@ -1,0 +1,43 @@
+/* src/components/NaviWindow.css */
+.navi-overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  animation: fadeIn 1s ease forwards;
+  z-index: 999;
+}
+
+.navi-window {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 2px solid #ccc;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.3);
+}
+
+.navi-character {
+  height: 80px;
+  margin-right: 1rem;
+}
+
+.navi-text {
+  flex-grow: 1;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.navi-close {
+  background: #fd9535;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
