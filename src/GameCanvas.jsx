@@ -122,27 +122,34 @@ export default function GameCanvas({ setScore, setLife, setBombs, paused }) {
   const hit = (x1, y1, w1, h1, x2, y2, w2, h2) =>
     x1 < x2 + w2 && x1 + w1 > x2 && y1 < y2 + h2 && y1 + h1 > y2;
 
-  return (
-    <div className="game-wrapper">
-      {gameOver ? (
-        <div
-          style={{
-            width: W,
-            height: H,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            background: "#000",
-            color: "#fff",
-          }}
-        >
-          <h1>GAME OVER</h1>
-          <button onClick={() => window.location.reload()}>TRY AGAIN</button>
-        </div>
-      ) : (
-        <canvas ref={cvsRef}></canvas>
-      )}
-    </div>
-  );
+return (
+  <div className="game-wrapper">
+    {!gameOver && (
+      <button
+        className="pause-button"
+        onClick={() => setPaused((prev) => !prev)}
+        aria-label="Pause"
+      ></button>
+    )}
+    {gameOver ? (
+      <div
+        style={{
+          width: W,
+          height: H,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          background: "#000",
+          color: "#fff",
+        }}
+      >
+        <h1>GAME OVER</h1>
+        <button onClick={() => window.location.reload()}>TRY AGAIN</button>
+      </div>
+    ) : (
+      <canvas ref={cvsRef}></canvas>
+    )}
+  </div>
+);
 }
