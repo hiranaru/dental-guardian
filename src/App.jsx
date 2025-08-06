@@ -1,33 +1,31 @@
 import { useState } from "react";
 import GameCanvas from "./GameCanvas";
 import GameUI from "./GameUI.jsx";
-import "./GameUI.css"; // CSSの読み込み
-import '../App.css'; // ← 新たに追加
-
+import "./GameUI.css"; // UI用CSS
+import "../App.css";   // グローバルCSS
 
 export default function App() {
   const [started, setStarted] = useState(false);
 
-  // ゲーム中のステート（初期値は例）
+  // ゲーム中のステータス管理
   const [score, setScore] = useState(0);
   const [life, setLife] = useState(5);
   const [bombs, setBombs] = useState(3);
+  const [paused, setPaused] = useState(false); // ポーズ状態
 
+  // ポーズボタン押下時の処理
   const handlePause = () => {
-    console.log("ポーズ処理（今後追加）");
-    // ここで一時停止処理などを追加予定
+    setPaused(prev => !prev); // ポーズ状態を切り替える
   };
 
   return started ? (
     <div className="game-wrapper">
-      {/* GameCanvasにスコア更新用関数を渡す */}
       <GameCanvas
         setScore={setScore}
         setLife={setLife}
         setBombs={setBombs}
+        paused={paused} // ← 追加
       />
-
-      {/* UIに現在のステータスとイベント処理を渡す */}
       <GameUI
         score={score}
         life={life}
