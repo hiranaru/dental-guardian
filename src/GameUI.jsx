@@ -5,16 +5,6 @@ export default function GameUI({ score, life, bombs, onPause }) {
     <div className="game-ui">
       {/* 上部バー */}
       <div className="ui-top-bar">
-        <div className="score">
-          クリーンポイント：
-          {score.toLocaleString('ja-JP', { minimumIntegerDigits: 9 })}
-        </div>
-        <div className="life">
-          🦷 歯の健康度：{life}
-        </div>
-        <div className="bombs">
-          💣 ボム：{bombs}
-        </div>
         <button className="pause-button" onClick={onPause}>⏸ ポーズ</button>
       </div>
 
