@@ -22,11 +22,3 @@ body {
   background: #fff;
   overflow: hidden; /* 画面スクロール防止 */
 }
-
-.game-wrapper {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  background: #fff;
-}
