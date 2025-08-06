@@ -1,12 +1,16 @@
 import { useState } from "react";
 import GameCanvas from "./GameCanvas";
-import GameUI from './GameUI.jsx';
+import GameUI from "./GameUI.jsx";
+import "./GameUI.css"; // CSSも忘れずに読み込む
 
 export default function App() {
   const [started, setStarted] = useState(false);
 
   return started ? (
-    <GameCanvas />
+    <div className="game-wrapper">
+      <GameCanvas />
+      <GameUI />
+    </div>
   ) : (
     <div style={{ textAlign: "center", marginTop: "5vh" }}>
       <img
@@ -17,7 +21,7 @@ export default function App() {
           maxHeight: "600px",
           width: "auto",
           height: "auto",
-          cursor: "pointer"
+          cursor: "pointer",
         }}
       />
     </div>
