@@ -2,6 +2,8 @@ import { useState } from "react";
 import GameCanvas from "./GameCanvas";
 import GameUI from "./GameUI.jsx";
 import "./GameUI.css"; // CSSの読み込み
+import './App.css'; // ← 新たに追加
+
 
 export default function App() {
   const [started, setStarted] = useState(false);
