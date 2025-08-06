@@ -1,0 +1,13 @@
+/* App.css または新しい CSSファイルに追加 */
+.game-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 800px; /* キャンバスサイズに合わせて調整 */
+  margin: 0 auto;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
